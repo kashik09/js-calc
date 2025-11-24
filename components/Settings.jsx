@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import ThemeSwitcher from './ThemeSwitcher'
+import { Moon, Sun, Waves, Sunrise } from 'lucide-react'
 import { buttonStyles, layouts, fontSizes } from '@/lib/themes'
+import { clearAllData } from '@/lib/storage'
 
 export default function Settings({
   theme,
@@ -69,7 +70,86 @@ export default function Settings({
         </div>
 
         {/* Theme */}
-        <ThemeSwitcher currentTheme={theme} onThemeChange={onThemeChange} />
+        <div className="mb-4">
+          <label className="block text-sm font-semibold mb-2">
+            Theme
+          </label>
+
+          {/* Icon button grid */}
+          <div className="grid grid-cols-4 gap-3">
+            <button
+              onClick={() => onThemeChange('dark')}
+              className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                theme === 'dark'
+                  ? 'ring-2 ring-offset-2'
+                  : 'hover:opacity-80'
+              }`}
+              style={{
+                backgroundColor: theme === 'dark' ? 'var(--btn-operator)' : 'var(--bg-secondary)',
+                borderColor: theme === 'dark' ? 'var(--btn-operator)' : 'var(--border-color)',
+                color: theme === 'dark' ? 'var(--btn-operator-text)' : 'var(--text-primary)',
+              }}
+              aria-label="Dark theme"
+            >
+              <Moon className="w-6 h-6" />
+              <span className="text-xs font-medium">Dark</span>
+            </button>
+
+            <button
+              onClick={() => onThemeChange('light')}
+              className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                theme === 'light'
+                  ? 'ring-2 ring-offset-2'
+                  : 'hover:opacity-80'
+              }`}
+              style={{
+                backgroundColor: theme === 'light' ? 'var(--btn-operator)' : 'var(--bg-secondary)',
+                borderColor: theme === 'light' ? 'var(--btn-operator)' : 'var(--border-color)',
+                color: theme === 'light' ? 'var(--btn-operator-text)' : 'var(--text-primary)',
+              }}
+              aria-label="Light theme"
+            >
+              <Sun className="w-6 h-6" />
+              <span className="text-xs font-medium">Light</span>
+            </button>
+
+            <button
+              onClick={() => onThemeChange('ocean')}
+              className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                theme === 'ocean'
+                  ? 'ring-2 ring-offset-2'
+                  : 'hover:opacity-80'
+              }`}
+              style={{
+                backgroundColor: theme === 'ocean' ? 'var(--btn-operator)' : 'var(--bg-secondary)',
+                borderColor: theme === 'ocean' ? 'var(--btn-operator)' : 'var(--border-color)',
+                color: theme === 'ocean' ? 'var(--btn-operator-text)' : 'var(--text-primary)',
+              }}
+              aria-label="Ocean theme"
+            >
+              <Waves className="w-6 h-6" />
+              <span className="text-xs font-medium">Ocean</span>
+            </button>
+
+            <button
+              onClick={() => onThemeChange('sunset')}
+              className={`flex flex-col items-center gap-2 p-4 rounded-lg border-2 transition-all ${
+                theme === 'sunset'
+                  ? 'ring-2 ring-offset-2'
+                  : 'hover:opacity-80'
+              }`}
+              style={{
+                backgroundColor: theme === 'sunset' ? 'var(--btn-operator)' : 'var(--bg-secondary)',
+                borderColor: theme === 'sunset' ? 'var(--btn-operator)' : 'var(--border-color)',
+                color: theme === 'sunset' ? 'var(--btn-operator-text)' : 'var(--text-primary)',
+              }}
+              aria-label="Sunset theme"
+            >
+              <Sunrise className="w-6 h-6" />
+              <span className="text-xs font-medium">Sunset</span>
+            </button>
+          </div>
+        </div>
 
         {/* Button Style */}
         <div className="mb-4">
