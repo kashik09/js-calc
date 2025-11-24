@@ -1,6 +1,7 @@
 'use client'
 
-import { useEffect, useCallback } from 'react'
+import { useEffect, useCallback, useState } from 'react'
+import { History as HistoryIcon, X, Settings as SettingsIcon } from 'lucide-react'
 import Display from './Display'
 import ButtonGrid from './ButtonGrid'
 import History from './History'
@@ -15,6 +16,8 @@ export default function Calculator() {
   const calculator = useCalculator()
   const historyHook = useHistory()
   const themeHook = useTheme()
+  const [isHistorySidebarOpen, setIsHistorySidebarOpen] = useState(false)
+  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
 
   // Handle keyboard input
   const handleKeyPress = useCallback((event) => {
@@ -94,75 +97,136 @@ export default function Calculator() {
   }
 
   return (
-    <div className="w-full max-w-6xl mx-auto p-4">
-      {/* Settings */}
-      <Settings
-        theme={themeHook.theme}
-        onThemeChange={themeHook.updateTheme}
-        buttonStyle={themeHook.buttonStyle}
-        onButtonStyleChange={themeHook.updateButtonStyle}
-        fontSize={themeHook.fontSize}
-        onFontSizeChange={themeHook.updateFontSize}
-        layout={themeHook.layout}
-        onLayoutChange={themeHook.updateLayout}
-        onResetDefaults={themeHook.resetToDefaults}
-      />
-
-      <div className="flex flex-col lg:flex-row gap-6 items-start">
-        {/* Calculator */}
-        <div
-          className="w-full lg:w-96 p-6 rounded-3xl shadow-2xl transition-all duration-300"
-          style={{
-            backgroundColor: 'var(--bg-secondary)',
-          }}
-        >
-          {/* Title */}
-          <h1 className="text-2xl font-bold mb-4 text-center">
-            JavaScript Calculator
-          </h1>
-
-          {/* Display */}
-          <Display
-            value={calculator.display}
-            memory={calculator.memory}
-            fontSize={themeHook.fontSize}
-            error={calculator.error}
-            operand1={calculator.operand1}
-            operator={calculator.operator}
-            showResult={calculator.showResult}
-            previousResult={calculator.previousResult}
+    <div className="w-full h-screen flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Settings Modal/Panel */}
+      {isSettingsOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div
+            className="absolute inset-0 bg-black bg-opacity-50"
+            onClick={() => setIsSettingsOpen(false)}
           />
+          <div
+            className="relative z-10 w-full max-w-md p-6 rounded-2xl shadow-2xl"
+            style={{ backgroundColor: 'var(--bg-secondary)' }}
+          >
+            <button
+              onClick={() => setIsSettingsOpen(false)}
+              className="absolute top-4 right-4 p-2 rounded-full hover:bg-opacity-10 hover:bg-gray-500 transition-all"
+              aria-label="Close settings"
+            >
+              <X size={20} />
+            </button>
+            <Settings
+              theme={themeHook.theme}
+              onThemeChange={themeHook.updateTheme}
+              buttonStyle={themeHook.buttonStyle}
+              onButtonStyleChange={themeHook.updateButtonStyle}
+              fontSize={themeHook.fontSize}
+              onFontSizeChange={themeHook.updateFontSize}
+              layout={themeHook.layout}
+              onLayoutChange={themeHook.updateLayout}
+              onResetDefaults={themeHook.resetToDefaults}
+            />
+          </div>
+        </div>
+      )}
 
-          {/* Button Grid */}
-          <ButtonGrid
-            onDigit={calculator.inputDigit}
-            onOperator={handleOperator}
-            onEquals={handleEquals}
-            onClear={calculator.clearAll}
-            onClearEntry={calculator.clearEntry}
-            onDecimal={calculator.inputDecimal}
-            onToggleSign={calculator.toggleSign}
-            onPercentage={calculator.applyPercentage}
-            onBackspace={calculator.backspace}
-            onMemoryAdd={calculator.memoryAdd}
-            onMemorySubtract={calculator.memorySubtract}
-            onMemoryRecall={calculator.memoryRecall}
-            onMemoryClear={calculator.memoryClear}
-            buttonStyle={themeHook.buttonStyle}
-            layout={themeHook.layout}
-            memory={calculator.memory}
-          />
+      {/* Calculator Card */}
+      <div
+        className="relative w-full max-w-md p-6 rounded-3xl shadow-2xl transition-all duration-300"
+        style={{
+          backgroundColor: 'var(--bg-secondary)',
+        }}
+      >
+        {/* Top Icons Row */}
+        <div className="absolute top-4 left-0 right-0 px-6 flex items-center justify-between z-10">
+          {/* Settings Icon - Top Left */}
+          <button
+            onClick={() => setIsSettingsOpen(true)}
+            className="p-2 rounded-full hover:bg-opacity-10 hover:bg-gray-500 transition-all"
+            aria-label="Open settings"
+          >
+            <SettingsIcon size={24} />
+          </button>
 
-          {/* Current operation indicator */}
-          {calculator.currentOperator && (
-            <div className="mt-4 text-center text-xs text-gray-500 opacity-60">
-              Current operation: {toDisplaySymbol(calculator.currentOperator)}
-            </div>
-          )}
+          {/* History Icon - Top Right */}
+          <button
+            onClick={() => setIsHistorySidebarOpen(!isHistorySidebarOpen)}
+            className="p-2 rounded-full hover:bg-opacity-10 hover:bg-gray-500 transition-all"
+            aria-label="Toggle history"
+          >
+            <HistoryIcon size={24} />
+          </button>
         </div>
 
-        {/* History */}
-        <div className="w-full lg:flex-1">
+        {/* Title */}
+        <h1 className="text-2xl font-bold mb-4 text-center mt-8">
+          JavaScript Calculator
+        </h1>
+
+        {/* Display */}
+        <Display
+          value={calculator.display}
+          memory={calculator.memory}
+          fontSize={themeHook.fontSize}
+          error={calculator.error}
+          operand1={calculator.operand1}
+          operator={calculator.operator}
+          showResult={calculator.showResult}
+          previousResult={calculator.previousResult}
+        />
+
+        {/* Button Grid */}
+        <ButtonGrid
+          onDigit={calculator.inputDigit}
+          onOperator={handleOperator}
+          onEquals={handleEquals}
+          onClear={calculator.clearAll}
+          onClearEntry={calculator.clearEntry}
+          onDecimal={calculator.inputDecimal}
+          onToggleSign={calculator.toggleSign}
+          onPercentage={calculator.applyPercentage}
+          onBackspace={calculator.backspace}
+          onMemoryAdd={calculator.memoryAdd}
+          onMemorySubtract={calculator.memorySubtract}
+          onMemoryRecall={calculator.memoryRecall}
+          onMemoryClear={calculator.memoryClear}
+          buttonStyle={themeHook.buttonStyle}
+          layout={themeHook.layout}
+          memory={calculator.memory}
+        />
+
+        {/* Current operation indicator */}
+        {calculator.currentOperator && (
+          <div className="mt-4 text-center text-xs text-gray-500 opacity-60">
+            Current operation: {toDisplaySymbol(calculator.currentOperator)}
+          </div>
+        )}
+      </div>
+
+      {/* History Sidebar - Slides from Right */}
+      <div
+        className={`fixed top-0 right-0 h-full w-[280px] md:w-[300px] shadow-2xl transition-transform duration-300 ease-in-out z-40 ${
+          isHistorySidebarOpen ? 'translate-x-0' : 'translate-x-full'
+        }`}
+        style={{
+          backgroundColor: 'var(--bg-secondary)',
+        }}
+      >
+        {/* Close Button */}
+        <div className="p-4 border-b" style={{ borderColor: 'var(--border-color)' }}>
+          <button
+            onClick={() => setIsHistorySidebarOpen(false)}
+            className="p-2 rounded-full hover:bg-opacity-10 hover:bg-gray-500 transition-all float-right"
+            aria-label="Close history"
+          >
+            <X size={20} />
+          </button>
+          <div className="clear-both" />
+        </div>
+
+        {/* History Content */}
+        <div className="h-full overflow-y-auto pb-20">
           <History
             history={historyHook.history}
             onClear={historyHook.clear}
@@ -179,8 +243,8 @@ export default function Calculator() {
       </div>
 
       {/* Footer */}
-      <div className="mt-8 text-center text-sm opacity-60">
-        <p className="mt-2">Press ⚙️ in the top right for settings and customization</p>
+      <div className="absolute bottom-4 left-0 right-0 text-center text-sm opacity-60">
+        <p>Press ⚙️ for settings • Press 🕒 for history</p>
       </div>
     </div>
   )

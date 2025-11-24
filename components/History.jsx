@@ -122,108 +122,89 @@ export default function History({
   onAddNote,
   statistics,
 }) {
-  const [isCollapsed, setIsCollapsed] = useState(false)
-
   return (
-    <div
-      className="w-full max-w-md rounded-2xl p-4 transition-all duration-300"
-      style={{
-        backgroundColor: 'var(--bg-secondary)',
-        borderColor: 'var(--border-color)',
-      }}
-    >
+    <div className="w-full p-4">
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
+      <div className="mb-4">
         <h2 className="text-xl font-bold">History</h2>
-        <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="text-sm opacity-60 hover:opacity-100"
-          aria-label={isCollapsed ? 'Expand history' : 'Collapse history'}
-        >
-          {isCollapsed ? '▼' : '▲'}
-        </button>
       </div>
 
-      {!isCollapsed && (
-        <>
-          {/* Statistics */}
-          <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
-            <div className="p-2 rounded" style={{ backgroundColor: 'var(--bg-primary)' }}>
-              Total: {statistics.total}
-            </div>
-            <div className="p-2 rounded" style={{ backgroundColor: 'var(--bg-primary)' }}>
-              Favorites: {statistics.favorites}
-            </div>
-          </div>
+      {/* Statistics */}
+      <div className="grid grid-cols-2 gap-2 mb-4 text-xs">
+        <div className="p-2 rounded" style={{ backgroundColor: 'var(--bg-primary)' }}>
+          Total: {statistics.total}
+        </div>
+        <div className="p-2 rounded" style={{ backgroundColor: 'var(--bg-primary)' }}>
+          Favorites: {statistics.favorites}
+        </div>
+      </div>
 
-          {/* Search */}
-          <input
-            type="text"
-            value={searchQuery}
-            onChange={(e) => onSearchChange(e.target.value)}
-            placeholder="Search calculations..."
-            className="w-full px-3 py-2 rounded-lg mb-3 text-sm"
+      {/* Search */}
+      <input
+        type="text"
+        value={searchQuery}
+        onChange={(e) => onSearchChange(e.target.value)}
+        placeholder="Search..."
+        className="w-full px-3 py-2 rounded-lg mb-3 text-sm"
+        style={{
+          backgroundColor: 'var(--bg-primary)',
+          borderColor: 'var(--border-color)',
+          color: 'var(--text-primary)',
+        }}
+      />
+
+      {/* Filter buttons */}
+      <div className="flex gap-1 mb-3 flex-wrap">
+        {['all', '+', '-', '×', '÷'].map((op) => (
+          <button
+            key={op}
+            onClick={() => onFilterChange(op)}
+            className={`px-2 py-1 rounded-lg text-xs transition-all ${
+              filter === op ? 'ring-2' : 'opacity-60'
+            }`}
             style={{
-              backgroundColor: 'var(--bg-primary)',
-              borderColor: 'var(--border-color)',
-              color: 'var(--text-primary)',
+              backgroundColor: filter === op ? 'var(--btn-operator)' : 'var(--bg-primary)',
+              color: filter === op ? 'var(--btn-operator-text)' : 'var(--text-primary)',
             }}
-          />
+            aria-label={`Filter by ${op === 'all' ? 'all operations' : op}`}
+          >
+            {op === 'all' ? 'All' : op}
+          </button>
+        ))}
+      </div>
 
-          {/* Filter buttons */}
-          <div className="flex gap-2 mb-3 flex-wrap">
-            {['all', '+', '-', '×', '÷'].map((op) => (
-              <button
-                key={op}
-                onClick={() => onFilterChange(op)}
-                className={`px-3 py-1 rounded-lg text-sm transition-all ${
-                  filter === op ? 'ring-2' : 'opacity-60'
-                }`}
-                style={{
-                  backgroundColor: filter === op ? 'var(--btn-operator)' : 'var(--bg-primary)',
-                  color: filter === op ? 'var(--btn-operator-text)' : 'var(--text-primary)',
-                }}
-                aria-label={`Filter by ${op === 'all' ? 'all operations' : op}`}
-              >
-                {op === 'all' ? 'All' : op}
-              </button>
-            ))}
+      {/* History list */}
+      <div className="mb-3">
+        {history.length === 0 ? (
+          <div className="text-center py-8 opacity-60 text-sm">
+            No calculations yet
           </div>
+        ) : (
+          history.map((calc, index) => (
+            <HistoryItem
+              key={calc.id || index}
+              calculation={calc}
+              onDelete={onDelete}
+              onToggleFavorite={onToggleFavorite}
+              onAddNote={onAddNote}
+            />
+          ))
+        )}
+      </div>
 
-          {/* History list */}
-          <div className="max-h-96 overflow-y-auto mb-3">
-            {history.length === 0 ? (
-              <div className="text-center py-8 opacity-60">
-                No calculations yet
-              </div>
-            ) : (
-              history.map((calc, index) => (
-                <HistoryItem
-                  key={calc.id || index}
-                  calculation={calc}
-                  onDelete={onDelete}
-                  onToggleFavorite={onToggleFavorite}
-                  onAddNote={onAddNote}
-                />
-              ))
-            )}
-          </div>
-
-          {/* Clear button */}
-          {history.length > 0 && (
-            <button
-              onClick={onClear}
-              className="w-full py-2 rounded-lg font-semibold transition-all hover:opacity-90"
-              style={{
-                backgroundColor: 'var(--btn-function)',
-                color: 'var(--btn-function-text)',
-              }}
-              aria-label="Clear all history"
-            >
-              Clear History
-            </button>
-          )}
-        </>
+      {/* Clear button */}
+      {history.length > 0 && (
+        <button
+          onClick={onClear}
+          className="w-full py-2 rounded-lg font-semibold transition-all hover:opacity-90 text-sm"
+          style={{
+            backgroundColor: 'var(--btn-function)',
+            color: 'var(--btn-function-text)',
+          }}
+          aria-label="Clear all history"
+        >
+          Clear History
+        </button>
       )}
     </div>
   )
