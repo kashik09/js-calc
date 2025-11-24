@@ -127,10 +127,10 @@ export default function ButtonGrid({
         <CalcButton onClick={() => onDigit(4)} type="number" style={buttonStyle}>4</CalcButton>
         <CalcButton onClick={() => onDigit(5)} type="number" style={buttonStyle}>5</CalcButton>
         <CalcButton onClick={() => onDigit(6)} type="number" style={buttonStyle}>6</CalcButton>
-        <CalcButton onClick={() => onOperator('+')} type="operator" style={buttonStyle} ariaLabel="Add" className="row-span-2">
+        <CalcButton onClick={() => onOperator('+')} type="operator" style={buttonStyle} ariaLabel="Add" className="row-span-3">
           +
         </CalcButton>
-        <CalcButton onClick={onEquals} type="equals" style={buttonStyle} ariaLabel="Equals" className="row-span-2">
+        <CalcButton onClick={onEquals} type="equals" style={buttonStyle} ariaLabel="Equals" className="row-span-3">
           =
         </CalcButton>
 
@@ -191,9 +191,9 @@ export default function ButtonGrid({
         +
       </CalcButton>
 
-      {/* Row 5: ±, 0, ., = */}
-      <CalcButton onClick={onToggleSign} type="function" style={buttonStyle} ariaLabel="Plus Minus">
-        ±
+      {/* Row 5: ⌫, 0, ., = */}
+      <CalcButton onClick={onBackspace} type="function" style={buttonStyle} ariaLabel="Backspace">
+        ⌫
       </CalcButton>
       <CalcButton onClick={() => onDigit(0)} type="number" style={buttonStyle}>0</CalcButton>
       <CalcButton onClick={onDecimal} type="number" style={buttonStyle} ariaLabel="Decimal point">
