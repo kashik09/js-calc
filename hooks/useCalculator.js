@@ -2,10 +2,7 @@ import { useState, useCallback } from 'react'
 import { calculate } from '@/lib/calculator'
 import { toInternalOperator } from '@/utils/symbols'
 
-/**
- * Custom hook for calculator logic
- * Manages calculator state and operations
- */
+/* Calculator logic */
 export function useCalculator() {
   const [display, setDisplay] = useState('0')
   const [operand1, setOperand1] = useState(null)
@@ -15,7 +12,7 @@ export function useCalculator() {
   const [memory, setMemory] = useState(0)
   const [error, setError] = useState(null)
 
-  // Input a digit
+  // digit
   const inputDigit = useCallback((digit) => {
     setError(null)
 
@@ -27,7 +24,7 @@ export function useCalculator() {
     }
   }, [display, waitingForOperand])
 
-  // Input decimal point
+  // decimal point
   const inputDecimal = useCallback(() => {
     setError(null)
 
@@ -39,7 +36,7 @@ export function useCalculator() {
     }
   }, [display, waitingForOperand])
 
-  // Clear everything
+  // Clear
   const clearAll = useCallback(() => {
     setDisplay('0')
     setOperand1(null)

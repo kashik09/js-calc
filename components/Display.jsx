@@ -2,10 +2,6 @@
 
 import { formatDisplayNumber } from '@/utils/symbols'
 
-/**
- * Calculator Display Component
- * Shows the current calculation or result
- */
 export default function Display({ value, memory, fontSize = 'medium', error = null }) {
   const fontSizeClasses = {
     small: 'text-3xl',
@@ -21,6 +17,7 @@ export default function Display({ value, memory, fontSize = 'medium', error = nu
            backgroundColor: 'var(--bg-display)',
            color: 'var(--text-display)',
          }}>
+      
       {/* Memory indicator */}
       {memory !== 0 && (
         <div className="text-sm opacity-70 mb-1">

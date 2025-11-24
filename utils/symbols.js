@@ -1,7 +1,4 @@
-/**
- * Symbol conversion utilities for calculator display
- * Converts internal operators to display symbols and vice versa
- */
+/* Symbol conversion */
 
 // Convert internal operator (* /) to display symbol (× ÷)
 export function toDisplaySymbol(operator) {
@@ -30,7 +27,7 @@ export function isOperator(char) {
   return ['+', '-', '*', '/', '×', '÷'].includes(char)
 }
 
-// Format number for display (remove trailing zeros, handle scientific notation)
+// Format number for display
 export function formatDisplayNumber(num) {
   if (num === null || num === undefined || num === '') return '0'
 
@@ -38,12 +35,10 @@ export function formatDisplayNumber(num) {
 
   if (isNaN(number)) return '0'
 
-  // Handle very large or very small numbers with scientific notation
   if (Math.abs(number) > 999999999 || (Math.abs(number) < 0.000001 && number !== 0)) {
     return number.toExponential(6)
   }
 
-  // Remove trailing zeros after decimal point
   const str = number.toString()
   if (str.includes('.')) {
     return parseFloat(str).toString()

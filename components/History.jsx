@@ -3,9 +3,6 @@
 import { useState } from 'react'
 import { formatDisplayNumber } from '@/utils/symbols'
 
-/**
- * History Item Component
- */
 function HistoryItem({ calculation, onDelete, onToggleFavorite, onAddNote }) {
   const [showNoteInput, setShowNoteInput] = useState(false)
   const [noteText, setNoteText] = useState(calculation.note || '')
@@ -29,6 +26,7 @@ function HistoryItem({ calculation, onDelete, onToggleFavorite, onAddNote }) {
     >
       <div className="flex items-start justify-between">
         <div className="flex-1">
+
           {/* Calculation */}
           <div className="font-mono text-lg">
             {formatDisplayNumber(calculation.operand1)} {calculation.operator} {formatDisplayNumber(calculation.operand2)} = <span className="font-bold">{formatDisplayNumber(calculation.result)}</span>
@@ -62,6 +60,7 @@ function HistoryItem({ calculation, onDelete, onToggleFavorite, onAddNote }) {
                 }}
                 autoFocus
               />
+
               <div className="flex gap-2 mt-1">
                 <button
                   onClick={handleSaveNote}
@@ -111,9 +110,6 @@ function HistoryItem({ calculation, onDelete, onToggleFavorite, onAddNote }) {
   )
 }
 
-/**
- * History Component
- */
 export default function History({
   history,
   onClear,

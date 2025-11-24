@@ -1,16 +1,14 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getHistory, saveHistory, addToHistory, clearHistory, deleteHistoryItem } from '@/lib/storage'
 
-/**
- * Custom hook for managing calculation history
- */
+/* Managing calculation history */
 export function useHistory() {
   const [history, setHistory] = useState([])
   const [filter, setFilter] = useState('all') // all, +, -, ×, ÷
   const [searchQuery, setSearchQuery] = useState('')
   const [favorites, setFavorites] = useState(new Set())
 
-  // Load history from localStorage on mount
+  // Load history
   useEffect(() => {
     const savedHistory = getHistory()
     setHistory(savedHistory)
@@ -31,7 +29,7 @@ export function useHistory() {
     return calcWithId
   }, [])
 
-  // Clear all history
+  // Clear history
   const clear = useCallback(() => {
     clearHistory()
     setHistory([])
@@ -43,7 +41,7 @@ export function useHistory() {
     const newHistory = deleteHistoryItem(id)
     setHistory(newHistory)
 
-    // Remove from favorites if it was favorited
+    // Remove favorites
     if (favorites.has(id)) {
       const newFavorites = new Set(favorites)
       newFavorites.delete(id)
@@ -101,10 +99,10 @@ export function useHistory() {
     return filtered
   }, [history, filter, searchQuery])
 
-  // Get display history (max 50 items)
+  // Display history (max 50 items)
   const displayHistory = filteredHistory().slice(0, 50)
 
-  // Get statistics
+  // Statistics
   const statistics = useCallback(() => {
     return {
       total: history.length,

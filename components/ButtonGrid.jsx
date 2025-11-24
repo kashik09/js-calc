@@ -2,9 +2,7 @@
 
 import { toDisplaySymbol } from '@/utils/symbols'
 
-/**
- * Calculator Button Component
- */
+/* Calculator Button */
 function CalcButton({ children, onClick, type = 'number', style = 'rounded', className = '', ariaLabel }) {
   const styleClasses = {
     rounded: 'rounded-2xl',
@@ -54,10 +52,7 @@ function CalcButton({ children, onClick, type = 'number', style = 'rounded', cla
   )
 }
 
-/**
- * Button Grid Component
- * Standard calculator layout
- */
+/* Button Grid Component */
 export default function ButtonGrid({
   onDigit,
   onOperator,
@@ -85,7 +80,7 @@ export default function ButtonGrid({
   if (isScientific) {
     return (
       <div className={`grid grid-cols-5 ${gridGap}`}>
-        {/* Scientific layout - includes memory and advanced functions */}
+        {/* memory + advanced functions */}
         {/* Row 1: Memory functions */}
         <CalcButton onClick={onMemoryClear} type="function" style={buttonStyle} ariaLabel="Memory Clear">
           MC

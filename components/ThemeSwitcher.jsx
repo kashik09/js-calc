@@ -2,9 +2,6 @@
 
 import { themes } from '@/lib/themes'
 
-/**
- * Theme Switcher Component
- */
 export default function ThemeSwitcher({ currentTheme, onThemeChange }) {
   return (
     <div className="mb-4">
@@ -25,7 +22,7 @@ export default function ThemeSwitcher({ currentTheme, onThemeChange }) {
       >
         {Object.entries(themes).map(([key, theme]) => (
           <option key={key} value={key}>
-            {theme.name} - {theme.description}
+            {theme.name}
           </option>
         ))}
       </select>
