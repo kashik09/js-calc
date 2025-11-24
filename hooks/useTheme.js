@@ -5,7 +5,7 @@ import { getPreferences, savePreferences } from '@/lib/storage'
  * Custom hook for managing theme and preferences
  */
 export function useTheme() {
-  const [theme, setTheme] = useState('light')
+  const [theme, setTheme] = useState('dark')
   const [buttonStyle, setButtonStyle] = useState('rounded')
   const [soundEnabled, setSoundEnabled] = useState(false)
   const [fontSize, setFontSize] = useState('medium')
@@ -14,7 +14,7 @@ export function useTheme() {
   // Load preferences from localStorage on mount
   useEffect(() => {
     const preferences = getPreferences()
-    setTheme(preferences.theme || 'light')
+    setTheme(preferences.theme || 'dark')
     setButtonStyle(preferences.buttonStyle || 'rounded')
     setSoundEnabled(preferences.soundEnabled || false)
     setFontSize(preferences.fontSize || 'medium')
@@ -22,7 +22,7 @@ export function useTheme() {
 
     // Apply theme to document
     if (typeof document !== 'undefined') {
-      document.documentElement.setAttribute('data-theme', preferences.theme || 'light')
+      document.documentElement.setAttribute('data-theme', preferences.theme || 'dark')
     }
   }, [])
 
@@ -74,7 +74,7 @@ export function useTheme() {
   // Reset to defaults
   const resetToDefaults = useCallback(() => {
     const defaultPrefs = {
-      theme: 'light',
+      theme: 'dark',
       buttonStyle: 'rounded',
       soundEnabled: false,
       fontSize: 'medium',
