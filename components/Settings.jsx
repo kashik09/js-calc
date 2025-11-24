@@ -2,14 +2,12 @@
 
 import { useState } from 'react'
 import { Moon, Sun, Waves, Sunrise } from 'lucide-react'
-import { buttonStyles, layouts, fontSizes } from '@/lib/themes'
+import { layouts, fontSizes } from '@/lib/themes'
 import { clearAllData } from '@/lib/storage'
 
 export default function Settings({
   theme,
   onThemeChange,
-  buttonStyle,
-  onButtonStyleChange,
   fontSize,
   onFontSizeChange,
   layout,
@@ -148,31 +146,6 @@ export default function Settings({
               <Sunrise className="w-6 h-6" />
               <span className="text-xs font-medium">Sunset</span>
             </button>
-          </div>
-        </div>
-
-        {/* Button Style */}
-        <div className="mb-4">
-          <label className="block text-sm font-semibold mb-2">
-            Button Style
-          </label>
-          <div className="grid grid-cols-2 gap-2">
-            {Object.entries(buttonStyles).map(([key, style]) => (
-              <button
-                key={key}
-                onClick={() => onButtonStyleChange(key)}
-                className={`p-3 rounded-lg text-sm transition-all ${
-                  buttonStyle === key ? 'ring-2' : ''
-                }`}
-                style={{
-                  backgroundColor: buttonStyle === key ? 'var(--btn-operator)' : 'var(--bg-secondary)',
-                  color: buttonStyle === key ? 'var(--btn-operator-text)' : 'var(--text-primary)',
-                }}
-              >
-                {style.name}
-                <div className="text-xs opacity-70">{style.description}</div>
-              </button>
-            ))}
           </div>
         </div>
 

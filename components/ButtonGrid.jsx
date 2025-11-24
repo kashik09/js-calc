@@ -6,9 +6,6 @@ import { toDisplaySymbol } from '@/utils/symbols'
 function CalcButton({ children, onClick, type = 'number', style = 'rounded', className = '', ariaLabel }) {
   const styleClasses = {
     rounded: 'rounded-2xl',
-    square: 'rounded-none',
-    neumorphic: 'rounded-2xl shadow-[inset_0_2px_4px_rgba(255,255,255,0.3),inset_0_-2px_4px_rgba(0,0,0,0.1)]',
-    glassmorphic: 'rounded-2xl backdrop-blur-sm bg-opacity-80',
   }
 
   const typeStyles = {
