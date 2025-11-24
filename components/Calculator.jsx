@@ -10,10 +10,7 @@ import { useHistory } from '@/hooks/useHistory'
 import { useTheme } from '@/hooks/useTheme'
 import { toDisplaySymbol, toInternalOperator } from '@/utils/symbols'
 
-/**
- * Main Calculator Component
- * Integrates all calculator functionality
- */
+/* Main Calculator Component */
 export default function Calculator() {
   const calculator = useCalculator()
   const historyHook = useHistory()
@@ -32,41 +29,48 @@ export default function Calculator() {
     if (/^[0-9]$/.test(key)) {
       calculator.inputDigit(parseInt(key))
     }
+
     // Operators
     else if (key === '+' || key === '-') {
       calculator.performOperation(key)
     }
+
     else if (key === '*') {
       calculator.performOperation('*')
     }
+
     else if (key === '/') {
       calculator.performOperation('/')
     }
+
     // Decimal
     else if (key === '.') {
       calculator.inputDecimal()
     }
+
     // Equals
     else if (key === '=' || key === 'Enter') {
       const result = calculator.equals()
       if (result) {
         historyHook.addCalculation({
           ...result,
-          operator: toDisplaySymbol(result.operator), // Convert to display symbol
+          operator: toDisplaySymbol(result.operator),
         })
       }
     }
+
     // Clear
     else if (key === 'Escape') {
       calculator.clearAll()
     }
+
     // Backspace
     else if (key === 'Backspace') {
       calculator.backspace()
     }
   }, [calculator, historyHook])
 
-  // Add keyboard event listener
+  // Keyboard event listener
   useEffect(() => {
     window.addEventListener('keydown', handleKeyPress)
     return () => window.removeEventListener('keydown', handleKeyPress)
@@ -78,7 +82,7 @@ export default function Calculator() {
     if (result) {
       historyHook.addCalculation({
         ...result,
-        operator: toDisplaySymbol(result.operator), // Convert to display symbol
+        operator: toDisplaySymbol(result.operator),
       })
     }
   }
@@ -97,8 +101,6 @@ export default function Calculator() {
         onThemeChange={themeHook.updateTheme}
         buttonStyle={themeHook.buttonStyle}
         onButtonStyleChange={themeHook.updateButtonStyle}
-        soundEnabled={themeHook.soundEnabled}
-        onToggleSound={themeHook.toggleSound}
         fontSize={themeHook.fontSize}
         onFontSizeChange={themeHook.updateFontSize}
         layout={themeHook.layout}
@@ -116,7 +118,7 @@ export default function Calculator() {
         >
           {/* Title */}
           <h1 className="text-2xl font-bold mb-4 text-center">
-            JS Calculator
+            JavaScript Calculator
           </h1>
 
           {/* Display */}
@@ -174,7 +176,6 @@ export default function Calculator() {
 
       {/* Footer */}
       <div className="mt-8 text-center text-sm opacity-60">
-        <p>Use keyboard shortcuts: 0-9 for numbers, +, -, *, / for operations, Enter for equals, Escape to clear</p>
         <p className="mt-2">Press ⚙️ in the top right for settings and customization</p>
       </div>
     </div>

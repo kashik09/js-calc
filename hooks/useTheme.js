@@ -1,22 +1,18 @@
 import { useState, useEffect, useCallback } from 'react'
 import { getPreferences, savePreferences } from '@/lib/storage'
 
-/**
- * Custom hook for managing theme and preferences
- */
+/* Theme / Preference management */
 export function useTheme() {
   const [theme, setTheme] = useState('dark')
   const [buttonStyle, setButtonStyle] = useState('rounded')
-  const [soundEnabled, setSoundEnabled] = useState(false)
   const [fontSize, setFontSize] = useState('medium')
   const [layout, setLayout] = useState('standard')
 
-  // Load preferences from localStorage on mount
+  // Load preferences
   useEffect(() => {
     const preferences = getPreferences()
     setTheme(preferences.theme || 'dark')
     setButtonStyle(preferences.buttonStyle || 'rounded')
-    setSoundEnabled(preferences.soundEnabled || false)
     setFontSize(preferences.fontSize || 'medium')
     setLayout(preferences.layout || 'standard')
 
@@ -46,15 +42,6 @@ export function useTheme() {
     savePreferences({ ...preferences, buttonStyle: newStyle })
   }, [])
 
-  // Toggle sound
-  const toggleSound = useCallback(() => {
-    const newSoundEnabled = !soundEnabled
-    setSoundEnabled(newSoundEnabled)
-
-    const preferences = getPreferences()
-    savePreferences({ ...preferences, soundEnabled: newSoundEnabled })
-  }, [soundEnabled])
-
   // Update font size
   const updateFontSize = useCallback((newSize) => {
     setFontSize(newSize)
@@ -83,7 +70,6 @@ export function useTheme() {
 
     setTheme(defaultPrefs.theme)
     setButtonStyle(defaultPrefs.buttonStyle)
-    setSoundEnabled(defaultPrefs.soundEnabled)
     setFontSize(defaultPrefs.fontSize)
     setLayout(defaultPrefs.layout)
 
@@ -97,12 +83,10 @@ export function useTheme() {
   return {
     theme,
     buttonStyle,
-    soundEnabled,
     fontSize,
     layout,
     updateTheme,
     updateButtonStyle,
-    toggleSound,
     updateFontSize,
     updateLayout,
     resetToDefaults,

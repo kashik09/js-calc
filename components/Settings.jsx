@@ -3,18 +3,12 @@
 import { useState } from 'react'
 import ThemeSwitcher from './ThemeSwitcher'
 import { buttonStyles, layouts, fontSizes } from '@/lib/themes'
-import { exportHistoryAsJSON, exportHistoryAsCSV, clearAllData } from '@/lib/storage'
 
-/**
- * Settings Component
- */
 export default function Settings({
   theme,
   onThemeChange,
   buttonStyle,
   onButtonStyleChange,
-  soundEnabled,
-  onToggleSound,
   fontSize,
   onFontSizeChange,
   layout,
@@ -22,28 +16,6 @@ export default function Settings({
   onResetDefaults,
 }) {
   const [isOpen, setIsOpen] = useState(false)
-
-  const handleExportJSON = () => {
-    const url = exportHistoryAsJSON()
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `calculator-history-${Date.now()}.json`
-    link.click()
-    URL.revokeObjectURL(url)
-  }
-
-  const handleExportCSV = () => {
-    const url = exportHistoryAsCSV()
-    if (url) {
-      const link = document.createElement('a')
-      link.href = url
-      link.download = `calculator-history-${Date.now()}.csv`
-      link.click()
-      URL.revokeObjectURL(url)
-    } else {
-      alert('No history to export')
-    }
-  }
 
   const handleClearAllData = () => {
     if (confirm('Are you sure you want to clear all data? This will remove history and reset all settings.')) {
@@ -173,56 +145,6 @@ export default function Settings({
           </div>
         </div>
 
-        {/* Sound Effects */}
-        <div className="mb-4">
-          <label className="flex items-center justify-between p-3 rounded-lg cursor-pointer"
-                 style={{ backgroundColor: 'var(--bg-secondary)' }}>
-            <span className="text-sm font-semibold">Sound Effects</span>
-            <button
-              onClick={onToggleSound}
-              className={`w-12 h-6 rounded-full transition-colors ${
-                soundEnabled ? 'bg-green-500' : 'bg-gray-400'
-              }`}
-              aria-label={soundEnabled ? 'Disable sound' : 'Enable sound'}
-            >
-              <div
-                className={`w-5 h-5 bg-white rounded-full transition-transform ${
-                  soundEnabled ? 'translate-x-6' : 'translate-x-1'
-                }`}
-              />
-            </button>
-          </label>
-        </div>
-
-        {/* Export Data */}
-        <div className="mb-4">
-          <label className="block text-sm font-semibold mb-2">
-            Export History
-          </label>
-          <div className="flex gap-2">
-            <button
-              onClick={handleExportJSON}
-              className="flex-1 py-2 px-4 rounded-lg font-semibold transition-all hover:opacity-90"
-              style={{
-                backgroundColor: 'var(--btn-function)',
-                color: 'var(--btn-function-text)',
-              }}
-            >
-              JSON
-            </button>
-            <button
-              onClick={handleExportCSV}
-              className="flex-1 py-2 px-4 rounded-lg font-semibold transition-all hover:opacity-90"
-              style={{
-                backgroundColor: 'var(--btn-function)',
-                color: 'var(--btn-function-text)',
-              }}
-            >
-              CSV
-            </button>
-          </div>
-        </div>
-
         {/* Reset & Clear */}
         <div className="flex gap-2">
           <button
@@ -241,19 +163,6 @@ export default function Settings({
           >
             Clear All Data
           </button>
-        </div>
-
-        {/* Keyboard Shortcuts */}
-        <div className="mt-6 p-4 rounded-lg text-xs" style={{ backgroundColor: 'var(--bg-secondary)' }}>
-          <div className="font-semibold mb-2">Keyboard Shortcuts</div>
-          <div className="space-y-1 opacity-80">
-            <div>0-9: Number input</div>
-            <div>+, -, *, /: Operations</div>
-            <div>Enter or =: Equals</div>
-            <div>Escape: Clear</div>
-            <div>Backspace: Delete digit</div>
-            <div>.: Decimal point</div>
-          </div>
         </div>
       </div>
     </>
