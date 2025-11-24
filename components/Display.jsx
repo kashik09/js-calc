@@ -2,14 +2,41 @@
 
 import { formatDisplayNumber } from '@/utils/symbols'
 
-export default function Display({ value, memory, fontSize = 'medium', error = null }) {
+export default function Display({
+  value,
+  memory,
+  fontSize = 'medium',
+  error = null,
+  operand1 = null,
+  operator = null,
+  showResult = false,
+  previousResult = null,
+}) {
   const fontSizeClasses = {
-    small: 'text-3xl',
-    medium: 'text-4xl',
-    large: 'text-5xl',
+    small: 'text-2xl',
+    medium: 'text-3xl',
+    large: 'text-4xl',
   }
 
-  const displayValue = error || formatDisplayNumber(value)
+  // Build equation display
+  let equationDisplay = ''
+
+  if (error) {
+    equationDisplay = error
+  } else if (showResult && previousResult) {
+    // After pressing =, show: "5 + 2 = 7"
+    equationDisplay = `${formatDisplayNumber(previousResult.operand1)} ${previousResult.operator} ${formatDisplayNumber(previousResult.operand2)} = ${formatDisplayNumber(previousResult.result)}`
+  } else if (operand1 !== null && operator) {
+    // Building equation: "5 +" or "5 + 2"
+    if (value !== '0' || operand1 === null) {
+      equationDisplay = `${formatDisplayNumber(operand1)} ${operator} ${value}`
+    } else {
+      equationDisplay = `${formatDisplayNumber(operand1)} ${operator}`
+    }
+  } else {
+    // Just show current value
+    equationDisplay = formatDisplayNumber(value)
+  }
 
   return (
     <div className="w-full p-6 rounded-2xl mb-4 transition-all duration-300"
@@ -17,7 +44,7 @@ export default function Display({ value, memory, fontSize = 'medium', error = nu
            backgroundColor: 'var(--bg-display)',
            color: 'var(--text-display)',
          }}>
-      
+
       {/* Memory indicator */}
       {memory !== 0 && (
         <div className="text-sm opacity-70 mb-1">
@@ -31,9 +58,9 @@ export default function Display({ value, memory, fontSize = 'medium', error = nu
         style={{ minHeight: '3rem' }}
         role="status"
         aria-live="polite"
-        aria-label={`Calculator display showing ${displayValue}`}
+        aria-label={`Calculator display showing ${equationDisplay}`}
       >
-        {displayValue}
+        {equationDisplay}
       </div>
     </div>
   )

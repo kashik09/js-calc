@@ -127,6 +127,10 @@ export default function Calculator() {
             memory={calculator.memory}
             fontSize={themeHook.fontSize}
             error={calculator.error}
+            operand1={calculator.operand1}
+            operator={calculator.operator}
+            showResult={calculator.showResult}
+            previousResult={calculator.previousResult}
           />
 
           {/* Button Grid */}
@@ -151,7 +155,7 @@ export default function Calculator() {
 
           {/* Current operation indicator */}
           {calculator.currentOperator && (
-            <div className="mt-4 text-center text-sm opacity-70">
+            <div className="mt-4 text-center text-xs text-gray-500 opacity-60">
               Current operation: {toDisplaySymbol(calculator.currentOperator)}
             </div>
           )}

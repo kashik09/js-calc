@@ -11,10 +11,14 @@ export function useCalculator() {
   const [waitingForOperand, setWaitingForOperand] = useState(false)
   const [memory, setMemory] = useState(0)
   const [error, setError] = useState(null)
+  const [showResult, setShowResult] = useState(false)
+  const [previousResult, setPreviousResult] = useState(null)
 
   // digit
   const inputDigit = useCallback((digit) => {
     setError(null)
+    setShowResult(false)
+    setPreviousResult(null)
 
     if (waitingForOperand) {
       setDisplay(String(digit))
@@ -44,6 +48,8 @@ export function useCalculator() {
     setOperator(null)
     setWaitingForOperand(false)
     setError(null)
+    setShowResult(false)
+    setPreviousResult(null)
   }, [])
 
   // Clear entry (current display only)
@@ -129,6 +135,8 @@ export function useCalculator() {
       setOperand1(calculation.result)
       setOperand2(calculation.operand2)
       setWaitingForOperand(true)
+      setShowResult(true)
+      setPreviousResult(calculation)
       return calculation
     }
 
@@ -178,6 +186,10 @@ export function useCalculator() {
     display,
     memory,
     error,
+    operand1,
+    operator,
+    showResult,
+    previousResult,
     inputDigit,
     inputDecimal,
     clearAll,
