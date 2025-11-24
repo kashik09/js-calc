@@ -1,8 +1,8 @@
 import './globals.css'
 
 export const metadata = {
-  title: 'JS Calculator - Modern Calculator App',
-  description: 'A modern, feature-rich JavaScript calculator built with Next.js',
+  title: 'JavaScript Calculator',
+  description: 'A calculator',
   keywords: ['calculator', 'javascript', 'nextjs', 'react', 'math'],
 }
 
