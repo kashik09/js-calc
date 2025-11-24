@@ -12,6 +12,7 @@ node_modules/
 
 # production
 /build
+.claude
 
 # misc
 .DS_Store
@@ -32,3 +33,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# scripts
+check-changes.sh
