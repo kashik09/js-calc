@@ -18,24 +18,25 @@ export default function Display({
     large: 'text-4xl',
   }
 
-  // Build equation display
-  let equationDisplay = ''
+  // Build equation history (smaller text at top)
+  let equationHistory = ''
+  // Build current value display (large text)
+  let currentDisplay = ''
 
   if (error) {
-    equationDisplay = error
+    currentDisplay = error
+    equationHistory = ''
   } else if (showResult && previousResult) {
-    // After pressing =, show: "5 + 2 = 7"
-    equationDisplay = `${formatDisplayNumber(previousResult.operand1)} ${previousResult.operator} ${formatDisplayNumber(previousResult.operand2)} = ${formatDisplayNumber(previousResult.result)}`
+    // After pressing =, show full equation
+    equationHistory = `${formatDisplayNumber(previousResult.operand1)} ${previousResult.operator} ${formatDisplayNumber(previousResult.operand2)} =`
+    currentDisplay = formatDisplayNumber(previousResult.result)
   } else if (operand1 !== null && operator) {
-    // Building equation: "5 +" or "5 + 2"
-    if (value !== '0' || operand1 === null) {
-      equationDisplay = `${formatDisplayNumber(operand1)} ${operator} ${value}`
-    } else {
-      equationDisplay = `${formatDisplayNumber(operand1)} ${operator}`
-    }
+    // Building equation: show "5 +" at top, current input at bottom
+    equationHistory = `${formatDisplayNumber(operand1)} ${operator}`
+    currentDisplay = formatDisplayNumber(value)
   } else {
     // Just show current value
-    equationDisplay = formatDisplayNumber(value)
+    currentDisplay = formatDisplayNumber(value)
   }
 
   return (
@@ -52,15 +53,22 @@ export default function Display({
         </div>
       )}
 
-      {/* Main display */}
+      {/* Equation history - smaller text at top */}
+      {equationHistory && (
+        <div className="text-sm opacity-70 mb-1 font-mono text-right">
+          {equationHistory}
+        </div>
+      )}
+
+      {/* Main display - current operand */}
       <div
         className={`font-mono text-right overflow-x-auto ${fontSizeClasses[fontSize]} ${error ? 'text-red-400' : ''}`}
         style={{ minHeight: '3rem' }}
         role="status"
         aria-live="polite"
-        aria-label={`Calculator display showing ${equationDisplay}`}
+        aria-label={`Calculator display showing ${currentDisplay}`}
       >
-        {equationDisplay}
+        {currentDisplay}
       </div>
     </div>
   )

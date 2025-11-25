@@ -1,11 +1,12 @@
 'use client'
 
 import { useEffect, useCallback, useState } from 'react'
-import { History as HistoryIcon, X, Settings as SettingsIcon } from 'lucide-react'
+import { History as HistoryIcon, Settings as SettingsIcon } from 'lucide-react'
 import Display from './Display'
 import ButtonGrid from './ButtonGrid'
 import History from './History'
 import Settings from './Settings'
+import DraggableModal from './DraggableModal'
 import { useCalculator } from '@/hooks/useCalculator'
 import { useHistory } from '@/hooks/useHistory'
 import { useTheme } from '@/hooks/useTheme'
@@ -16,8 +17,7 @@ export default function Calculator() {
   const calculator = useCalculator()
   const historyHook = useHistory()
   const themeHook = useTheme()
-  const [isHistorySidebarOpen, setIsHistorySidebarOpen] = useState(false)
-  const [isSettingsOpen, setIsSettingsOpen] = useState(false)
+  const [activeModal, setActiveModal] = useState(null) // 'settings' | 'history' | null
 
   // Handle keyboard input
   const handleKeyPress = useCallback((event) => {
@@ -98,38 +98,48 @@ export default function Calculator() {
 
   return (
     <div className="w-full h-screen flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Settings Modal/Panel */}
-      {isSettingsOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          <div
-            className="absolute inset-0 bg-black bg-opacity-50"
-            onClick={() => setIsSettingsOpen(false)}
+      {/* Settings Modal */}
+      <DraggableModal
+        isOpen={activeModal === 'settings'}
+        onClose={() => setActiveModal(null)}
+        title="Settings"
+        defaultPosition={{ x: typeof window !== 'undefined' ? window.innerWidth / 2 + 50 : 500, y: 100 }}
+      >
+        <div className="p-6">
+          <Settings
+            theme={themeHook.theme}
+            onThemeChange={themeHook.updateTheme}
+            buttonStyle={themeHook.buttonStyle}
+            onButtonStyleChange={themeHook.updateButtonStyle}
+            fontSize={themeHook.fontSize}
+            onFontSizeChange={themeHook.updateFontSize}
+            layout={themeHook.layout}
+            onLayoutChange={themeHook.updateLayout}
+            onResetDefaults={themeHook.resetToDefaults}
           />
-          <div
-            className="relative z-10 w-full max-w-md p-6 rounded-2xl shadow-2xl"
-            style={{ backgroundColor: 'var(--bg-secondary)' }}
-          >
-            <button
-              onClick={() => setIsSettingsOpen(false)}
-              className="absolute top-4 right-4 p-2 rounded-full hover:bg-opacity-10 hover:bg-gray-500 transition-all"
-              aria-label="Close settings"
-            >
-              <X size={20} />
-            </button>
-            <Settings
-              theme={themeHook.theme}
-              onThemeChange={themeHook.updateTheme}
-              buttonStyle={themeHook.buttonStyle}
-              onButtonStyleChange={themeHook.updateButtonStyle}
-              fontSize={themeHook.fontSize}
-              onFontSizeChange={themeHook.updateFontSize}
-              layout={themeHook.layout}
-              onLayoutChange={themeHook.updateLayout}
-              onResetDefaults={themeHook.resetToDefaults}
-            />
-          </div>
         </div>
-      )}
+      </DraggableModal>
+
+      {/* History Modal */}
+      <DraggableModal
+        isOpen={activeModal === 'history'}
+        onClose={() => setActiveModal(null)}
+        title="History"
+        defaultPosition={{ x: typeof window !== 'undefined' ? window.innerWidth - 450 : 600, y: 100 }}
+      >
+        <History
+          history={historyHook.history}
+          onClear={historyHook.clear}
+          onDelete={historyHook.deleteItem}
+          filter={historyHook.filter}
+          onFilterChange={historyHook.setFilter}
+          searchQuery={historyHook.searchQuery}
+          onSearchChange={historyHook.setSearchQuery}
+          onToggleFavorite={historyHook.toggleFavorite}
+          onAddNote={historyHook.addNote}
+          statistics={historyHook.statistics}
+        />
+      </DraggableModal>
 
       {/* Calculator Card */}
       <div
@@ -142,7 +152,7 @@ export default function Calculator() {
         <div className="absolute top-4 left-0 right-0 px-6 flex items-center justify-between z-10">
           {/* Settings Icon - Top Left */}
           <button
-            onClick={() => setIsSettingsOpen(true)}
+            onClick={() => setActiveModal(activeModal === 'settings' ? null : 'settings')}
             className="p-2 rounded-full hover:bg-opacity-10 hover:bg-gray-500 transition-all"
             aria-label="Open settings"
           >
@@ -151,7 +161,7 @@ export default function Calculator() {
 
           {/* History Icon - Top Right */}
           <button
-            onClick={() => setIsHistorySidebarOpen(!isHistorySidebarOpen)}
+            onClick={() => setActiveModal(activeModal === 'history' ? null : 'history')}
             className="p-2 rounded-full hover:bg-opacity-10 hover:bg-gray-500 transition-all"
             aria-label="Toggle history"
           >
@@ -204,47 +214,9 @@ export default function Calculator() {
         )}
       </div>
 
-      {/* History Sidebar - Slides from Right */}
-      <div
-        className={`fixed top-0 right-0 h-full w-[280px] md:w-[300px] shadow-2xl transition-transform duration-300 ease-in-out z-40 ${
-          isHistorySidebarOpen ? 'translate-x-0' : 'translate-x-full'
-        }`}
-        style={{
-          backgroundColor: 'var(--bg-secondary)',
-        }}
-      >
-        {/* Close Button */}
-        <div className="p-4 border-b" style={{ borderColor: 'var(--border-color)' }}>
-          <button
-            onClick={() => setIsHistorySidebarOpen(false)}
-            className="p-2 rounded-full hover:bg-opacity-10 hover:bg-gray-500 transition-all float-right"
-            aria-label="Close history"
-          >
-            <X size={20} />
-          </button>
-          <div className="clear-both" />
-        </div>
-
-        {/* History Content */}
-        <div className="h-full overflow-y-auto pb-20">
-          <History
-            history={historyHook.history}
-            onClear={historyHook.clear}
-            onDelete={historyHook.deleteItem}
-            filter={historyHook.filter}
-            onFilterChange={historyHook.setFilter}
-            searchQuery={historyHook.searchQuery}
-            onSearchChange={historyHook.setSearchQuery}
-            onToggleFavorite={historyHook.toggleFavorite}
-            onAddNote={historyHook.addNote}
-            statistics={historyHook.statistics}
-          />
-        </div>
-      </div>
-
       {/* Footer */}
       <div className="absolute bottom-4 left-0 right-0 text-center text-sm opacity-60">
-        <p>Press ⚙️ for settings • Press 🕒 for history</p>
+        <p>Click ⚙️ for settings • Click 🕒 for history • Drag modal title bars to reposition</p>
       </div>
     </div>
   )
