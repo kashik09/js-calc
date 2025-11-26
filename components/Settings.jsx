@@ -1,8 +1,10 @@
 'use client'
 
+import { useState } from 'react'
 import { Moon, Sun, Waves, Sunrise } from 'lucide-react'
 import { layouts, fontSizes } from '@/lib/themes'
 import { clearAllData } from '@/lib/storage'
+import ConfirmationModal from './ConfirmationModal'
 
 export default function Settings({
   theme,
@@ -13,12 +15,15 @@ export default function Settings({
   onLayoutChange,
   onResetDefaults,
 }) {
+  const [confirmModal, setConfirmModal] = useState(null) // 'clearData' | 'resetSettings' | null
+
   const handleClearAllData = () => {
-    if (confirm('Are you sure you want to clear all data? This will remove history and reset all settings.')) {
-      clearAllData()
-      onResetDefaults()
-      alert('All data cleared!')
-    }
+    clearAllData()
+    onResetDefaults()
+  }
+
+  const handleResetSettings = () => {
+    onResetDefaults()
   }
 
   return (
@@ -162,7 +167,7 @@ export default function Settings({
       {/* Reset & Clear */}
       <div className="flex gap-2">
         <button
-          onClick={onResetDefaults}
+          onClick={() => setConfirmModal('resetSettings')}
           className="flex-1 py-2 px-4 rounded-lg font-semibold transition-all hover:opacity-90"
           style={{
             backgroundColor: 'var(--btn-function)',
@@ -172,12 +177,35 @@ export default function Settings({
           Reset Settings
         </button>
         <button
-          onClick={handleClearAllData}
+          onClick={() => setConfirmModal('clearData')}
           className="flex-1 py-2 px-4 rounded-lg font-semibold transition-all hover:opacity-90 bg-red-500 text-white"
         >
           Clear All Data
         </button>
       </div>
+
+      {/* Confirmation Modals */}
+      <ConfirmationModal
+        isOpen={confirmModal === 'clearData'}
+        onClose={() => setConfirmModal(null)}
+        onConfirm={handleClearAllData}
+        title="Clear All Data"
+        message="This will remove all calculation history and reset all settings to defaults. This action cannot be undone."
+        confirmText="Yes, clear my data"
+        cancelText="No, don't clear my data"
+        confirmStyle="danger"
+      />
+
+      <ConfirmationModal
+        isOpen={confirmModal === 'resetSettings'}
+        onClose={() => setConfirmModal(null)}
+        onConfirm={handleResetSettings}
+        title="Reset Settings"
+        message="This will reset theme, layout, and font size to default values. Your calculation history will not be affected."
+        confirmText="Yes, reset my settings"
+        cancelText="No, make no changes"
+        confirmStyle="warning"
+      />
     </div>
   )
 }

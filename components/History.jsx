@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { formatDisplayNumber } from '@/utils/symbols'
+import ConfirmationModal from './ConfirmationModal'
 
 function HistoryItem({ calculation, onDelete, onToggleFavorite, onAddNote }) {
   const [showNoteInput, setShowNoteInput] = useState(false)
@@ -29,7 +30,17 @@ function HistoryItem({ calculation, onDelete, onToggleFavorite, onAddNote }) {
 
           {/* Calculation */}
           <div className="font-mono text-lg">
-            {formatDisplayNumber(calculation.operand1)} {calculation.operator} {formatDisplayNumber(calculation.operand2)} = <span className="font-bold">{formatDisplayNumber(calculation.result)}</span>
+            {calculation.expression ? (
+              // PEMDAS expression
+              <>
+                {calculation.expression} = <span className="font-bold">{formatDisplayNumber(calculation.result)}</span>
+              </>
+            ) : (
+              // Simple two-operand calculation
+              <>
+                {formatDisplayNumber(calculation.operand1)} {calculation.operator} {formatDisplayNumber(calculation.operand2)} = <span className="font-bold">{formatDisplayNumber(calculation.result)}</span>
+              </>
+            )}
           </div>
 
           {/* Timestamp */}
@@ -122,6 +133,12 @@ export default function History({
   onAddNote,
   statistics,
 }) {
+  const [showClearConfirm, setShowClearConfirm] = useState(false)
+
+  const handleClearHistory = () => {
+    onClear()
+  }
+
   return (
     <div className="w-full p-4">
       {/* Header */}
@@ -195,7 +212,7 @@ export default function History({
       {/* Clear button */}
       {history.length > 0 && (
         <button
-          onClick={onClear}
+          onClick={() => setShowClearConfirm(true)}
           className="w-full py-2 rounded-lg font-semibold transition-all hover:opacity-90 text-sm"
           style={{
             backgroundColor: 'var(--btn-function)',
@@ -206,6 +223,18 @@ export default function History({
           Clear History
         </button>
       )}
+
+      {/* Confirmation Modal */}
+      <ConfirmationModal
+        isOpen={showClearConfirm}
+        onClose={() => setShowClearConfirm(false)}
+        onConfirm={handleClearHistory}
+        title="Clear History"
+        message={`This will permanently delete all ${history.length} calculation${history.length !== 1 ? 's' : ''} from your history. This action cannot be undone.`}
+        confirmText="Yes, clear my history"
+        cancelText="No, don't touch my history"
+        confirmStyle="warning"
+      />
     </div>
   )
 }
