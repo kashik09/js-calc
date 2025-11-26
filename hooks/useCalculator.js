@@ -1,18 +1,19 @@
 import { useState, useCallback } from 'react'
-import { calculate } from '@/lib/calculator'
-import { toInternalOperator } from '@/utils/symbols'
+import { evaluateExpression } from '@/lib/expressionEvaluator'
+import { toInternalOperator, toDisplaySymbol } from '@/utils/symbols'
 
-/* Calculator logic */
+/* Calculator logic with PEMDAS support */
 export function useCalculator() {
   const [display, setDisplay] = useState('0')
-  const [operand1, setOperand1] = useState(null)
-  const [operand2, setOperand2] = useState(null)
-  const [operator, setOperator] = useState(null)
-  const [waitingForOperand, setWaitingForOperand] = useState(false)
+  const [expression, setExpression] = useState('') // Full expression being built
   const [memory, setMemory] = useState(0)
   const [error, setError] = useState(null)
   const [showResult, setShowResult] = useState(false)
   const [previousResult, setPreviousResult] = useState(null)
+
+  // Legacy state for display compatibility
+  const [operand1, setOperand1] = useState(null)
+  const [operator, setOperator] = useState(null)
 
   // digit
   const inputDigit = useCallback((digit) => {
@@ -20,33 +21,36 @@ export function useCalculator() {
     setShowResult(false)
     setPreviousResult(null)
 
-    if (waitingForOperand) {
+    if (showResult) {
+      // Starting new calculation after result
+      setExpression('')
       setDisplay(String(digit))
-      setWaitingForOperand(false)
+    } else if (display === '0') {
+      setDisplay(String(digit))
     } else {
-      setDisplay(display === '0' ? String(digit) : display + digit)
+      setDisplay(display + digit)
     }
-  }, [display, waitingForOperand])
+  }, [display, showResult])
 
   // decimal point
   const inputDecimal = useCallback(() => {
     setError(null)
 
-    if (waitingForOperand) {
+    if (showResult) {
+      setExpression('')
       setDisplay('0.')
-      setWaitingForOperand(false)
+      setShowResult(false)
     } else if (display.indexOf('.') === -1) {
       setDisplay(display + '.')
     }
-  }, [display, waitingForOperand])
+  }, [display, showResult])
 
   // Clear
   const clearAll = useCallback(() => {
     setDisplay('0')
+    setExpression('')
     setOperand1(null)
-    setOperand2(null)
     setOperator(null)
-    setWaitingForOperand(false)
     setError(null)
     setShowResult(false)
     setPreviousResult(null)
@@ -58,73 +62,77 @@ export function useCalculator() {
     setError(null)
   }, [])
 
-  // Perform operation
+  // Perform operation - Build expression with PEMDAS
   const performOperation = useCallback((nextOperator) => {
     setError(null)
-    const inputValue = parseFloat(display)
+    setShowResult(false)
+    setPreviousResult(null)
 
-    if (operand1 === null) {
-      setOperand1(inputValue)
-    } else if (operator) {
-      const currentOperand1 = operand1 || 0
-      const newOperand2 = inputValue
+    // Convert operator to internal format for expression
+    const internalOp = toInternalOperator(nextOperator)
 
-      try {
-        // Convert display operator to internal operator
-        const internalOp = toInternalOperator(operator)
-        const result = calculate(currentOperand1, newOperand2, internalOp)
+    // Add current display value to expression
+    const newExpression = expression + display + internalOp
+    setExpression(newExpression)
 
-        setDisplay(String(result))
-        setOperand1(result)
-        setOperand2(newOperand2)
-      } catch (err) {
-        setError(err.message)
-        setDisplay('Error')
-        setOperand1(null)
-        setOperand2(null)
-        setOperator(null)
-        setWaitingForOperand(false)
-        return
-      }
+    // Show the expression in display
+    setDisplay('0')
+    setOperator(nextOperator) // For legacy display support
+
+    // Store first operand for display component compatibility
+    if (!operand1 && expression === '') {
+      setOperand1(parseFloat(display))
     }
+  }, [display, expression, operand1])
 
-    setWaitingForOperand(true)
-    setOperator(nextOperator)
-  }, [display, operand1, operator])
-
-  // Calculate equals
+  // Calculate equals - Evaluate full expression with PEMDAS
   const calculateEquals = useCallback(() => {
     setError(null)
-    const inputValue = parseFloat(display)
 
-    if (operator && operand1 !== null) {
-      const currentOperand1 = operand1
-      const currentOperand2 = operand2 !== null ? operand2 : inputValue
+    // Build complete expression with current display
+    const fullExpression = expression + display
 
-      try {
-        const internalOp = toInternalOperator(operator)
-        const result = calculate(currentOperand1, currentOperand2, internalOp)
-
-        return {
-          operand1: currentOperand1,
-          operand2: currentOperand2,
-          operator: operator,
-          result: result,
-          timestamp: Date.now(),
-        }
-      } catch (err) {
-        setError(err.message)
-        setDisplay('Error')
-        setOperand1(null)
-        setOperand2(null)
-        setOperator(null)
-        setWaitingForOperand(false)
-        return null
-      }
+    if (!fullExpression || fullExpression === '0') {
+      return null
     }
 
-    return null
-  }, [display, operand1, operand2, operator])
+    try {
+      // Check for unbalanced parentheses first
+      const openCount = (fullExpression.match(/\(/g) || []).length
+      const closeCount = (fullExpression.match(/\)/g) || []).length
+
+      if (openCount !== closeCount) {
+        const msg = openCount > closeCount
+          ? `Missing ${openCount - closeCount} closing parenthesis${openCount - closeCount > 1 ? 'es' : ''}`
+          : `Extra ${closeCount - openCount} closing parenthesis${closeCount - openCount > 1 ? 'es' : ''}`
+        throw new Error(msg)
+      }
+
+      // Evaluate using PEMDAS
+      const result = evaluateExpression(fullExpression)
+
+      if (result === null || isNaN(result)) {
+        throw new Error('Invalid expression')
+      }
+
+      return {
+        operand1: null, // Not applicable for multi-operation expressions
+        operand2: null,
+        operator: null,
+        expression: fullExpression, // Store full expression
+        result: result,
+        timestamp: Date.now(),
+      }
+    } catch (err) {
+      const errorMsg = err.message || 'Invalid expression'
+      setError(errorMsg)
+      setDisplay('Error')
+      setExpression('')
+      setOperand1(null)
+      setOperator(null)
+      return null
+    }
+  }, [display, expression])
 
   // Equals button handler
   const equals = useCallback(() => {
@@ -132,9 +140,9 @@ export function useCalculator() {
 
     if (calculation) {
       setDisplay(String(calculation.result))
-      setOperand1(calculation.result)
-      setOperand2(calculation.operand2)
-      setWaitingForOperand(true)
+      setExpression(String(calculation.result)) // Result becomes new starting point
+      setOperand1(null)
+      setOperator(null)
       setShowResult(true)
       setPreviousResult(calculation)
       return calculation
@@ -157,12 +165,39 @@ export function useCalculator() {
 
   // Backspace
   const backspace = useCallback(() => {
-    if (display.length > 1) {
+    if (showResult) {
+      // After showing result, backspace clears
+      clearAll()
+    } else if (display.length > 1) {
       setDisplay(display.slice(0, -1))
     } else {
       setDisplay('0')
     }
-  }, [display])
+  }, [display, showResult])
+
+  // Input parenthesis (for scientific mode)
+  const inputParenthesis = useCallback((paren) => {
+    setError(null)
+    setShowResult(false)
+    setPreviousResult(null)
+
+    if (paren === '(') {
+      // Opening parenthesis
+      if (display === '0' || showResult) {
+        setExpression(expression + '(')
+        setDisplay('0')
+      } else {
+        // After a number, add operator first (implicit multiplication)
+        setExpression(expression + display + '*(')
+        setDisplay('0')
+      }
+    } else if (paren === ')') {
+      // Closing parenthesis
+      const fullExpr = expression + display + ')'
+      setExpression(fullExpr)
+      setDisplay('0')
+    }
+  }, [display, expression, showResult])
 
   // Memory functions
   const memoryAdd = useCallback(() => {
@@ -188,6 +223,7 @@ export function useCalculator() {
     error,
     operand1,
     operator,
+    expression, // Full expression being built
     showResult,
     previousResult,
     inputDigit,
@@ -199,6 +235,7 @@ export function useCalculator() {
     toggleSign,
     applyPercentage,
     backspace,
+    inputParenthesis, // For scientific mode
     memoryAdd,
     memorySubtract,
     memoryRecall,

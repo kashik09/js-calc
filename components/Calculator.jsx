@@ -97,7 +97,7 @@ export default function Calculator() {
   }
 
   return (
-    <div className="w-full h-screen flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="w-full h-screen flex items-center justify-center p-2 sm:p-4 relative overflow-hidden">
       {/* Settings Modal */}
       <DraggableModal
         isOpen={activeModal === 'settings'}
@@ -126,6 +126,11 @@ export default function Calculator() {
         onClose={() => setActiveModal(null)}
         title="History"
         defaultPosition={{ x: typeof window !== 'undefined' ? window.innerWidth - 450 : 600, y: 100 }}
+        resizable={true}
+        defaultWidth={400}
+        defaultHeight={500}
+        minWidth={400}
+        minHeight={400}
       >
         <History
           history={historyHook.history}
@@ -143,9 +148,10 @@ export default function Calculator() {
 
       {/* Calculator Card */}
       <div
-        className="relative w-full max-w-md p-6 rounded-3xl shadow-2xl transition-all duration-300"
+        className="relative w-full max-w-[95vw] sm:max-w-md p-4 sm:p-6 rounded-3xl shadow-2xl transition-all duration-300"
         style={{
           backgroundColor: 'var(--bg-secondary)',
+          width: 'clamp(320px, 95vw, 28rem)',
         }}
       >
         {/* Top Icons Row */}
@@ -182,6 +188,7 @@ export default function Calculator() {
           error={calculator.error}
           operand1={calculator.operand1}
           operator={calculator.operator}
+          expression={calculator.expression}
           showResult={calculator.showResult}
           previousResult={calculator.previousResult}
         />
@@ -197,6 +204,7 @@ export default function Calculator() {
           onToggleSign={calculator.toggleSign}
           onPercentage={calculator.applyPercentage}
           onBackspace={calculator.backspace}
+          onParenthesis={calculator.inputParenthesis}
           onMemoryAdd={calculator.memoryAdd}
           onMemorySubtract={calculator.memorySubtract}
           onMemoryRecall={calculator.memoryRecall}
@@ -206,17 +214,12 @@ export default function Calculator() {
           memory={calculator.memory}
         />
 
-        {/* Current operation indicator */}
-        {calculator.currentOperator && (
-          <div className="mt-4 text-center text-xs text-gray-500 opacity-60">
-            Current operation: {toDisplaySymbol(calculator.currentOperator)}
-          </div>
-        )}
       </div>
 
       {/* Footer */}
-      <div className="absolute bottom-4 left-0 right-0 text-center text-sm opacity-60">
-        <p>Click ⚙️ for settings • Click 🕒 for history • Drag modal title bars to reposition</p>
+      <div className="fixed bottom-2 sm:bottom-4 left-0 right-0 text-center text-xs sm:text-sm opacity-60 px-2">
+        <p className="hidden sm:block">Click ⚙️ for settings • Click 🕒 for history • Drag modal title bars to reposition</p>
+        <p className="sm:hidden">⚙️ Settings • 🕒 History</p>
       </div>
     </div>
   )

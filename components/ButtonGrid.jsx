@@ -64,6 +64,7 @@ export default function ButtonGrid({
   onMemorySubtract,
   onMemoryRecall,
   onMemoryClear,
+  onParenthesis, // For scientific mode
   buttonStyle = 'rounded',
   layout = 'standard',
   memory = 0,
@@ -95,18 +96,18 @@ export default function ButtonGrid({
           AC
         </CalcButton>
 
-        {/* Row 2: Functions */}
+        {/* Row 2: Parentheses + Functions */}
+        <CalcButton onClick={() => onParenthesis?.('(')} type="function" style={buttonStyle} ariaLabel="Open Parenthesis">
+          (
+        </CalcButton>
+        <CalcButton onClick={() => onParenthesis?.(')')} type="function" style={buttonStyle} ariaLabel="Close Parenthesis">
+          )
+        </CalcButton>
         <CalcButton onClick={onPercentage} type="function" style={buttonStyle} ariaLabel="Percentage">
           %
         </CalcButton>
-        <CalcButton onClick={onToggleSign} type="function" style={buttonStyle} ariaLabel="Plus Minus">
-          ±
-        </CalcButton>
         <CalcButton onClick={onBackspace} type="function" style={buttonStyle} ariaLabel="Backspace">
           ⌫
-        </CalcButton>
-        <CalcButton onClick={onClearEntry} type="function" style={buttonStyle} ariaLabel="Clear Entry">
-          CE
         </CalcButton>
         <CalcButton onClick={() => onOperator('/')} type="operator" style={buttonStyle} ariaLabel="Divide">
           {toDisplaySymbol('/')}

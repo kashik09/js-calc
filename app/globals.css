@@ -111,3 +111,20 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: var(--btn-operator);
 }
+
+/* Responsive page layout - no scrolling */
+html, body {
+  height: 100vh;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+#__next {
+  height: 100%;
+}
+
+/* Ensure modals don't cause body scroll */
+body.modal-open {
+  overflow: hidden;
+}

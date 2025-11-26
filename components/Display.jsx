@@ -9,6 +9,7 @@ export default function Display({
   error = null,
   operand1 = null,
   operator = null,
+  expression = '',
   showResult = false,
   previousResult = null,
 }) {
@@ -27,12 +28,23 @@ export default function Display({
     currentDisplay = error
     equationHistory = ''
   } else if (showResult && previousResult) {
-    // After pressing =, show full equation
-    equationHistory = `${formatDisplayNumber(previousResult.operand1)} ${previousResult.operator} ${formatDisplayNumber(previousResult.operand2)} =`
-    currentDisplay = formatDisplayNumber(previousResult.result)
+    // After pressing =, show full expression with result
+    if (previousResult.expression) {
+      // PEMDAS expression
+      equationHistory = `${previousResult.expression} =`
+      currentDisplay = formatDisplayNumber(previousResult.result)
+    } else {
+      // Simple two-operand calculation
+      equationHistory = `${formatDisplayNumber(previousResult.operand1)} ${previousResult.operator} ${formatDisplayNumber(previousResult.operand2)} =`
+      currentDisplay = formatDisplayNumber(previousResult.result)
+    }
+  } else if (expression) {
+    // Building PEMDAS expression: show full expression including current number
+    equationHistory = expression + (value !== '0' ? formatDisplayNumber(value) : '')
+    currentDisplay = formatDisplayNumber(value)
   } else if (operand1 !== null && operator) {
-    // Building equation: show "5 +" at top, current input at bottom
-    equationHistory = `${formatDisplayNumber(operand1)} ${operator}`
+    // Legacy: Building simple equation - show full equation including current number
+    equationHistory = `${formatDisplayNumber(operand1)} ${operator} ${formatDisplayNumber(value)}`
     currentDisplay = formatDisplayNumber(value)
   } else {
     // Just show current value
