@@ -191,8 +191,8 @@ export default function Settings({
         onConfirm={handleClearAllData}
         title="Clear All Data"
         message="This will remove all calculation history and reset all settings to defaults. This action cannot be undone."
-        confirmText="Yes, clear my data"
-        cancelText="No, don't clear my data"
+        confirmText="Yes, clear data"
+        cancelText="No, keep data"
         confirmStyle="danger"
       />
 
@@ -202,8 +202,8 @@ export default function Settings({
         onConfirm={handleResetSettings}
         title="Reset Settings"
         message="This will reset theme, layout, and font size to default values. Your calculation history will not be affected."
-        confirmText="Yes, reset my settings"
-        cancelText="No, make no changes"
+        confirmText="Yes, reset"
+        cancelText="No, keep"
         confirmStyle="warning"
       />
     </div>
