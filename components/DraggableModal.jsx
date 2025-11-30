@@ -22,12 +22,13 @@ export default function DraggableModal({
   const [height, setHeight] = useState(defaultHeight)
   const [isDragging, setIsDragging] = useState(false)
   const [isResizing, setIsResizing] = useState(false)
-  const [resizeDirection, setResizeDirection] = useState(null) // 'n', 's', 'e', 'w', 'ne', 'nw', 'se', 'sw'
+  const [resizeDirection, setResizeDirection] = useState(null)
   const [dragStart, setDragStart] = useState({ x: 0, y: 0 })
   const [resizeStart, setResizeStart] = useState({ x: 0, y: 0, width: 0, height: 0, position: { x: 0, y: 0 } })
   const [isClosing, setIsClosing] = useState(false)
   const [ctrlPressed, setCtrlPressed] = useState(false)
   const modalRef = useRef(null)
+  const contentRef = useRef(null)
   const previousIsOpen = useRef(false)
   const isDesktop = typeof window !== 'undefined' && window.innerWidth >= 768
 
@@ -37,7 +38,7 @@ export default function DraggableModal({
     setTimeout(() => {
       setIsClosing(false)
       onClose()
-    }, 350) // Match animation duration
+    }, 350)
   }, [onClose])
 
   // Handle ESC key and Ctrl key for aspect ratio locking
@@ -70,13 +71,12 @@ export default function DraggableModal({
       if (savedPosition) {
         try {
           const parsedPosition = JSON.parse(savedPosition)
-          // Validate position is within viewport bounds
           const viewportWidth = window.innerWidth
           const viewportHeight = window.innerHeight
           if (
             parsedPosition.x >= 0 &&
             parsedPosition.y >= 0 &&
-            parsedPosition.x < viewportWidth - 200 && // Ensure at least 200px visible
+            parsedPosition.x < viewportWidth - 200 &&
             parsedPosition.y < viewportHeight - 100
           ) {
             setPosition(parsedPosition)
@@ -88,16 +88,11 @@ export default function DraggableModal({
     }
   }, [title])
 
-  // Only reset position when transitioning from closed to open (not on every render)
-  // On mobile, always reset to center. On desktop, keep saved position.
   useEffect(() => {
     if (isOpen && !previousIsOpen.current) {
-      // Modal just opened
       if (typeof window !== 'undefined' && window.innerWidth < 768) {
-        // Mobile: reset to center
         setPosition(defaultPosition)
       }
-      // Desktop: position already loaded from localStorage, no reset needed
       if (!resizable) {
         setWidth(defaultWidth)
         setHeight(defaultHeight)
@@ -140,7 +135,12 @@ export default function DraggableModal({
   }, [width, height, resizable, title])
 
   const handleMouseDown = (e) => {
-    // Only drag if clicking on title bar (and not resizing)
+    // Don't drag if clicking inside content area
+    if (contentRef.current && contentRef.current.contains(e.target)) {
+      return
+    }
+    
+    // Only drag if clicking on title bar
     if (e.target.closest('.modal-title-bar') && !e.target.closest('.resize-handle')) {
       setIsDragging(true)
       setDragStart({
@@ -151,7 +151,11 @@ export default function DraggableModal({
   }
 
   const handleTouchStart = (e) => {
-    // Only drag if touching title bar (and not resizing)
+    // Don't drag if touching inside content area
+    if (contentRef.current && contentRef.current.contains(e.target)) {
+      return
+    }
+    
     if (e.target.closest('.modal-title-bar') && !e.target.closest('.resize-handle')) {
       const touch = e.touches[0]
       setIsDragging(true)
@@ -165,6 +169,7 @@ export default function DraggableModal({
   const handleResizeStart = (direction) => (e) => {
     if (!resizable) return
     e.stopPropagation()
+    e.preventDefault() // Prevent text selection during resize
     setIsResizing(true)
     setResizeDirection(direction)
     setResizeStart({
@@ -196,12 +201,10 @@ export default function DraggableModal({
       const newX = e.clientX - dragStart.x
       const newY = e.clientY - dragStart.y
 
-      // Get modal dimensions
       const modalRect = modalRef.current.getBoundingClientRect()
       const viewportWidth = window.innerWidth
       const viewportHeight = window.innerHeight
 
-      // Keep modal within viewport bounds
       const boundedX = Math.max(0, Math.min(newX, viewportWidth - modalRect.width))
       const boundedY = Math.max(0, Math.min(newY, viewportHeight - modalRect.height))
 
@@ -219,7 +222,6 @@ export default function DraggableModal({
       let newHeight = resizeStart.height
       let newPosition = { ...resizeStart.position }
 
-      // Calculate new dimensions based on direction
       if (resizeDirection.includes('e')) {
         newWidth = resizeStart.width + deltaX
       }
@@ -233,21 +235,18 @@ export default function DraggableModal({
         newHeight = resizeStart.height - deltaY
       }
 
-      // Aspect ratio locking with Ctrl/Cmd
-      if (ctrlPressed && (resizeDirection === 'ne' || resizeDirection === 'nw' || resizeDirection === 'se' || resizeDirection === 'sw')) {
+      if (ctrlPressed) {
         const aspectRatio = resizeStart.width / resizeStart.height
-        if (Math.abs(deltaX) > Math.abs(deltaY)) {
+        if (resizeDirection.includes('e') || resizeDirection.includes('w')) {
           newHeight = newWidth / aspectRatio
         } else {
           newWidth = newHeight * aspectRatio
         }
       }
 
-      // Apply min/max constraints
       newWidth = Math.max(minWidth, Math.min(newWidth, effectiveMaxWidth))
       newHeight = Math.max(minHeight, Math.min(newHeight, effectiveMaxHeight))
 
-      // Adjust position for north and west directions
       if (resizeDirection.includes('w')) {
         newPosition.x = resizeStart.position.x + (resizeStart.width - newWidth)
       }
@@ -268,12 +267,10 @@ export default function DraggableModal({
       const newX = touch.clientX - dragStart.x
       const newY = touch.clientY - dragStart.y
 
-      // Get modal dimensions
       const modalRect = modalRef.current.getBoundingClientRect()
       const viewportWidth = window.innerWidth
       const viewportHeight = window.innerHeight
 
-      // Keep modal within viewport bounds
       const boundedX = Math.max(0, Math.min(newX, viewportWidth - modalRect.width))
       const boundedY = Math.max(0, Math.min(newY, viewportHeight - modalRect.height))
 
@@ -291,7 +288,6 @@ export default function DraggableModal({
       let newHeight = resizeStart.height
       let newPosition = { ...resizeStart.position }
 
-      // Calculate new dimensions based on direction
       if (resizeDirection.includes('e')) {
         newWidth = resizeStart.width + deltaX
       }
@@ -305,14 +301,9 @@ export default function DraggableModal({
         newHeight = resizeStart.height - deltaY
       }
 
-      // Aspect ratio locking with Ctrl/Cmd (touch doesn't support Ctrl, so skip)
-      // Touch users can still resize freely without aspect ratio locking
-
-      // Apply min/max constraints
       newWidth = Math.max(minWidth, Math.min(newWidth, effectiveMaxWidth))
       newHeight = Math.max(minHeight, Math.min(newHeight, effectiveMaxHeight))
 
-      // Adjust position for north and west directions
       if (resizeDirection.includes('w')) {
         newPosition.x = resizeStart.position.x + (resizeStart.width - newWidth)
       }
@@ -327,7 +318,6 @@ export default function DraggableModal({
   }
 
   const handleMouseUp = () => {
-    // Save position to localStorage when drag ends (desktop only)
     if (isDragging && typeof window !== 'undefined' && window.innerWidth >= 768) {
       localStorage.setItem(`modal-position-${title}`, JSON.stringify(position))
     }
@@ -338,7 +328,6 @@ export default function DraggableModal({
   }
 
   const handleTouchEnd = () => {
-    // Save position to localStorage when drag ends (desktop only)
     if (isDragging && typeof window !== 'undefined' && window.innerWidth >= 768) {
       localStorage.setItem(`modal-position-${title}`, JSON.stringify(position))
     }
@@ -348,7 +337,6 @@ export default function DraggableModal({
     setResizeDirection(null)
   }
 
-  // Add/remove mouse and touch event listeners
   useEffect(() => {
     if (isDragging || isResizing) {
       window.addEventListener('mousemove', handleMouseMove)
@@ -364,7 +352,6 @@ export default function DraggableModal({
     }
   }, [isDragging, isResizing, dragStart, position, resizeStart, width, height, resizeDirection, ctrlPressed])
 
-  // Helper function to get cursor style based on resize direction
   const getResizeCursor = () => {
     if (isDragging) return 'grabbing'
     if (!isResizing || !resizeDirection) return 'default'
@@ -406,7 +393,7 @@ export default function DraggableModal({
           width: resizable ? `${width}px` : 'auto',
           height: resizable ? `${height}px` : 'auto',
           backgroundColor: 'var(--bg-secondary)',
-          cursor: getResizeCursor(),
+          cursor: isDragging || isResizing ? getResizeCursor() : 'default',
           opacity: isClosing ? 0 : 1,
           transform: isClosing ? 'translateY(-20px)' : 'translateY(0)',
           transitionDuration: '350ms',
@@ -415,64 +402,64 @@ export default function DraggableModal({
         onMouseDown={handleMouseDown}
         onTouchStart={handleTouchStart}
       >
-        {/* Resize Handles - 8 directions */}
+        {/* Resize Handles - ONLY on edges, with pointer-events-none on content */}
         {resizable && (
           <>
-            {/* Edge Handles */}
+            {/* Edge Handles - Made thinner and more intentional */}
             {/* Top */}
             <div
-              className="resize-handle absolute left-0 right-0 top-0 h-2 cursor-ns-resize hover:bg-opacity-20 hover:bg-gray-500 transition-colors"
+              className="resize-handle absolute left-0 right-0 top-0 h-1 cursor-ns-resize hover:bg-opacity-20 hover:bg-gray-500 transition-colors"
               onMouseDown={handleResizeStart('n')}
               onTouchStart={handleResizeTouchStart('n')}
               style={{ zIndex: 10 }}
             />
             {/* Bottom */}
             <div
-              className="resize-handle absolute left-0 right-0 bottom-0 h-2 cursor-ns-resize hover:bg-opacity-20 hover:bg-gray-500 transition-colors"
+              className="resize-handle absolute left-0 right-0 bottom-0 h-1 cursor-ns-resize hover:bg-opacity-20 hover:bg-gray-500 transition-colors"
               onMouseDown={handleResizeStart('s')}
               onTouchStart={handleResizeTouchStart('s')}
               style={{ zIndex: 10 }}
             />
             {/* Left */}
             <div
-              className="resize-handle absolute left-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-opacity-20 hover:bg-gray-500 transition-colors"
+              className="resize-handle absolute left-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-opacity-20 hover:bg-gray-500 transition-colors"
               onMouseDown={handleResizeStart('w')}
               onTouchStart={handleResizeTouchStart('w')}
               style={{ zIndex: 10 }}
             />
             {/* Right */}
             <div
-              className="resize-handle absolute right-0 top-0 bottom-0 w-2 cursor-ew-resize hover:bg-opacity-20 hover:bg-gray-500 transition-colors"
+              className="resize-handle absolute right-0 top-0 bottom-0 w-1 cursor-ew-resize hover:bg-opacity-20 hover:bg-gray-500 transition-colors"
               onMouseDown={handleResizeStart('e')}
               onTouchStart={handleResizeTouchStart('e')}
               style={{ zIndex: 10 }}
             />
 
-            {/* Corner Handles */}
+            {/* Corner Handles - Made smaller */}
             {/* Top-Left */}
             <div
-              className="resize-handle absolute left-0 top-0 w-4 h-4 cursor-nwse-resize hover:bg-opacity-30 hover:bg-gray-500 transition-colors"
+              className="resize-handle absolute left-0 top-0 w-3 h-3 cursor-nwse-resize hover:bg-opacity-30 hover:bg-gray-500 transition-colors"
               onMouseDown={handleResizeStart('nw')}
               onTouchStart={handleResizeTouchStart('nw')}
               style={{ zIndex: 11 }}
             />
             {/* Top-Right */}
             <div
-              className="resize-handle absolute right-0 top-0 w-4 h-4 cursor-nesw-resize hover:bg-opacity-30 hover:bg-gray-500 transition-colors"
+              className="resize-handle absolute right-0 top-0 w-3 h-3 cursor-nesw-resize hover:bg-opacity-30 hover:bg-gray-500 transition-colors"
               onMouseDown={handleResizeStart('ne')}
               onTouchStart={handleResizeTouchStart('ne')}
               style={{ zIndex: 11 }}
             />
             {/* Bottom-Left */}
             <div
-              className="resize-handle absolute left-0 bottom-0 w-4 h-4 cursor-nesw-resize hover:bg-opacity-30 hover:bg-gray-500 transition-colors"
+              className="resize-handle absolute left-0 bottom-0 w-3 h-3 cursor-nesw-resize hover:bg-opacity-30 hover:bg-gray-500 transition-colors"
               onMouseDown={handleResizeStart('sw')}
               onTouchStart={handleResizeTouchStart('sw')}
               style={{ zIndex: 11 }}
             />
             {/* Bottom-Right */}
             <div
-              className="resize-handle absolute right-0 bottom-0 w-4 h-4 cursor-nwse-resize hover:bg-opacity-30 hover:bg-gray-500 transition-colors"
+              className="resize-handle absolute right-0 bottom-0 w-3 h-3 cursor-nwse-resize hover:bg-opacity-30 hover:bg-gray-500 transition-colors"
               onMouseDown={handleResizeStart('se')}
               onTouchStart={handleResizeTouchStart('se')}
               style={{ zIndex: 11 }}
@@ -498,18 +485,16 @@ export default function DraggableModal({
           </button>
         </div>
 
-        {/* Content */}
+        {/* Content - CRITICAL: Add ref here and pointer-events */}
         <div
+          ref={contentRef}
           className="overflow-y-auto"
           style={{
             height: resizable ? `calc(100% - 64px)` : 'auto',
             maxHeight: resizable ? 'none' : 'calc(90vh - 80px)',
-            pointerEvents: 'auto', // Allow scrolling in content
-            position: 'relative', // Create stacking context
-            zIndex: 1, // Above resize handles
+            cursor: 'auto', // Force default cursor in content
+            userSelect: 'text', // Allow text selection
           }}
-          onMouseDown={(e) => e.stopPropagation()} // Prevent drag when clicking content
-          onTouchStart={(e) => e.stopPropagation()} // Prevent drag on touch
         >
           {children}
         </div>
