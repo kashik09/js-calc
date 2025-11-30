@@ -504,7 +504,12 @@ export default function DraggableModal({
           style={{
             height: resizable ? `calc(100% - 64px)` : 'auto',
             maxHeight: resizable ? 'none' : 'calc(90vh - 80px)',
+            pointerEvents: 'auto', // Allow scrolling in content
+            position: 'relative', // Create stacking context
+            zIndex: 1, // Above resize handles
           }}
+          onMouseDown={(e) => e.stopPropagation()} // Prevent drag when clicking content
+          onTouchStart={(e) => e.stopPropagation()} // Prevent drag on touch
         >
           {children}
         </div>
