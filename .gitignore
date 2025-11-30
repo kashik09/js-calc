@@ -33,8 +33,3 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
-
-# scripts
-check-changes.sh
-
-IMPLEMENTATION_PLAN.md
