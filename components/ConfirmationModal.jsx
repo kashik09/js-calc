@@ -54,7 +54,7 @@ export default function ConfirmationModal({
         className="fixed left-1/2 top-1/2 transform -translate-x-1/2 -translate-y-1/2 z-50 rounded-2xl shadow-2xl overflow-hidden transition-all"
         style={{
           backgroundColor: 'var(--bg-secondary)',
-          width: 'clamp(280px, 90vw, 360px)',
+          width: 'clamp(300px, 90vw, 420px)',
         }}
       >
         {/* Title Bar */}
@@ -76,14 +76,14 @@ export default function ConfirmationModal({
         </div>
 
         {/* Content */}
-        <div className="p-5">
-          <p className="text-sm mb-5 leading-relaxed">{message}</p>
+        <div className="p-6">
+          <p className="text-sm mb-6 leading-relaxed">{message}</p>
 
-          {/* Action Buttons */}
-          <div className="flex gap-3 justify-end">
+          {/* Action Buttons - FIXED: Equal width grid */}
+          <div className="grid grid-cols-2 gap-3">
             <button
               onClick={onClose}
-              className="py-2 px-4 rounded-md text-sm font-medium transition-all hover:opacity-80 border"
+              className="py-3 px-4 rounded-lg text-sm font-medium transition-all hover:opacity-80 border"
               style={{
                 backgroundColor: 'var(--bg-secondary)',
                 color: 'var(--text-primary)',
@@ -94,7 +94,7 @@ export default function ConfirmationModal({
             </button>
             <button
               onClick={handleConfirm}
-              className="py-2 px-4 rounded-md text-sm font-medium transition-all hover:opacity-90"
+              className="py-3 px-4 rounded-lg text-sm font-medium transition-all hover:opacity-90"
               style={getConfirmButtonStyle()}
             >
               {confirmText}
