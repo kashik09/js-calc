@@ -232,7 +232,7 @@ export default function History({
         title="Clear History"
         message={`This will permanently delete all ${history.length} calculation${history.length !== 1 ? 's' : ''} from your history. This action cannot be undone.`}
         confirmText="Yes, clear my history"
-        cancelText="No, don't touch my history"
+        cancelText="No, keep my history"
         confirmStyle="warning"
       />
     </div>
