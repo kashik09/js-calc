@@ -202,9 +202,8 @@ export default function Settings({
         onConfirm={handleResetSettings}
         title="Reset Settings"
         message="This will reset theme, layout, and font size to default values. Your calculation history will not be affected."
-        confirmText="Yes, reset my setting"
-        cancelText="No, keep my data"
-        confirmStyle="warning"
+        confirmText="Yes, reset my settings"
+        cancelText="No, keep my setting data"
       />
     </div>
   )
