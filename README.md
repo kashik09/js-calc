@@ -111,11 +111,11 @@ Icon-based theme selector provides visual feedback and intuitive selection.
 
 ## Tech Stack
 
-- **Next.js 16** (App Router)
-- **React 19** with hooks
+- **Next.js 16.0.3** (App Router)
+- **React 19.2.0** with hooks
 - **JavaScript** (.js/.jsx files - NO TypeScript)
-- **Tailwind CSS v3.4** for styling
-- **Lucide React** for icons
+- **Tailwind CSS 3.4.18** for styling
+- **Lucide React 0.554.0** for icons
 - **localStorage** for data persistence
 - **CSS Variables** for theming
 
@@ -128,7 +128,7 @@ Icon-based theme selector provides visual feedback and intuitive selection.
 
 1. Clone the repository:
 ```bash
-git clone <repository-url>
+git clone https://github.com/kashik09/js-calc.git
 cd js-calc
 ```
 
@@ -142,8 +142,7 @@ npm install
 npm run dev
 ```
 
-4. Open [http://localhost:3001](http://localhost:3001) in your browser
-   (Note: Port 3001 is used if 3000 is already in use)
+4. Open [http://localhost:3000](http://localhost:3000) in your browser
 
 ### Build for Production
 
@@ -157,28 +156,35 @@ npm start
 ```
 js-calc/
 ├── app/
-│   ├── layout.js          # Root layout with metadata
-│   ├── page.js            # Home page (calculator)
-│   └── globals.css        # Global styles & theme CSS variables
+│   ├── layout.js             # Root layout with metadata
+│   ├── page.js               # Home page (calculator)
+│   └── globals.css           # Global styles & theme CSS variables
 ├── components/
-│   ├── Calculator.jsx     # Main calculator component
-│   ├── Display.jsx        # Calculator display (split layout)
-│   ├── ButtonGrid.jsx     # Calculator buttons (Standard/Scientific)
-│   ├── History.jsx        # Calculation history panel
-│   ├── Settings.jsx       # Settings panel (themes, layouts, fonts)
-│   └── DraggableModal.jsx # Reusable draggable modal wrapper
+│   ├── Calculator.jsx        # Main calculator component
+│   ├── Display.jsx           # Calculator display (split layout)
+│   ├── ButtonGrid.jsx        # Calculator buttons (Standard/Scientific)
+│   ├── History.jsx           # Calculation history panel
+│   ├── Settings.jsx          # Settings panel (themes, layouts, fonts)
+│   ├── DraggableModal.jsx    # Reusable draggable modal wrapper
+│   ├── ConfirmationModal.jsx # Confirmation dialog for destructive actions
+│   └── ThemeSwitcher.jsx     # Theme switcher component
 ├── lib/
-│   ├── calculator.js      # Core math functions (add, subtract, multiply, divide, calculate)
-│   ├── storage.js         # localStorage utilities
-│   └── themes.js          # Theme configurations (layouts, fontSizes)
+│   ├── calculator.js         # Core math functions (add, subtract, multiply, divide, calculate)
+│   ├── expressionEvaluator.js # Expression parsing and evaluation
+│   ├── storage.js            # localStorage utilities
+│   └── themes.js             # Theme configurations (layouts, fontSizes)
 ├── hooks/
-│   ├── useCalculator.js   # Calculator state & logic hook
-│   ├── useHistory.js      # History management hook
-│   └── useTheme.js        # Theme management hook
+│   ├── useCalculator.js      # Calculator state & logic hook
+│   ├── useHistory.js         # History management hook
+│   └── useTheme.js           # Theme management hook
 ├── utils/
-│   └── symbols.js         # Symbol conversion (×, ÷) & number formatting
-└── public/
-    └── (static assets)
+│   └── symbols.js            # Symbol conversion (×, ÷) & number formatting
+├── public/
+│   └── (static assets)
+├── next.config.js            # Next.js configuration
+├── tailwind.config.js        # Tailwind CSS configuration
+├── postcss.config.js         # PostCSS configuration
+└── package.json              # Project dependencies and scripts
 ```
 
 ## Core Functions
@@ -330,11 +336,11 @@ ISC
 
 ## Known Features & Behavior
 
-- **Port**: Development server uses port 3001 if 3000 is occupied
 - **Display Logic**: Shows current operand being typed, not previous operand
 - **Modal Position**: Resets when modal is closed and reopened
 - **History**: Stored in browser localStorage (cleared on browser data clear)
 - **Equation Display**: Small text shows "5 +" while typing "2" for "5 + 2"
+- **Data Persistence**: All preferences and history are stored locally in the browser
 
 ## Support
 
